@@ -1,0 +1,6 @@
+Minix>>MINIX 3 is a free, open-source, operating system designed to be highly reliable, flexible, and secure. It is based on a tiny microkernel running in kernel mode with the rest of the operating system running as a collection of isolated, protected, processes in user mode. See more at http://www.minix3.org/
+lucaspc>>This is the guy who created me, if you want to donate something or just send a hello or thanks, be free to /msg him anytime!
+pkgin>>usage: pkgin in <package_name> - install packages; pkgin avail -list the list of available packages, see more at: http://wiki.minix3.org/UsersGuide/InstallingBinaryPackages
+hello>>hello, how are you today?
+bye>> bye bye ! :) 
+X11>>X Window System is the system of GUI of Minix, see more at: http://wiki.minix3.org/UsersGuide/IntroductionToX
