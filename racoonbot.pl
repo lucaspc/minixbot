@@ -1,6 +1,7 @@
 #!/usr/bin/perl
-use warnings;
-use strict;
+
+use Modern::Perl;
+use autodie;
 
 package racoonbot;
 use base qw( Bot::BasicBot );
@@ -14,7 +15,7 @@ sub save_memory{
    
    open my $fh, ">>", $mem_file;
    
-   print $fh "$key:$value\n";
+   print $fh "$key>>$value\n";
    
    close $fh;
    return 1;
@@ -26,7 +27,7 @@ sub load_memory{
 
    while (<$fh>){
       
-      my ($key, $value) = split /:/, $_;
+      my ($key, $value) = split />>/, $_;
       $memory{$key} = $value;     
            
    }
@@ -35,14 +36,16 @@ sub load_memory{
    return 1;
 }
 
+
 sub said {
    my ($self, $message) = @_;
-   
-   if($message->{address} eq 'racoon' or 
+     
+         
+   if($message->{address} eq 'racoonbot' or 
       $message->{address} eq 'msg')  {
       load_memory("memory.txt");
    
-      if ($message->{body} =~ /(.+) is (.+)/ ) {
+      if ($message->{body} =~ /(.+) =save (.+)/ ) {
         
         
         save_memory("memory.txt", $1, $2);
@@ -65,13 +68,10 @@ sub said {
    }
 }
 
-# help text for the bot
-sub help { "Bot of #minix, always read to help you!" }
+sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
-# Create an instance of the bot and start it running. Connect
-# to the main perl IRC server, and join some channels.
 racoonbot->new(
    server => 'irc.freenode.net',
-   channels => [ '#minix' ],
+   channels => [ '#minix'],
    nick => 'racoonbot',
-)->run();
+->run();
