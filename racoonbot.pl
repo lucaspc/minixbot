@@ -5,7 +5,7 @@ use autodie;
 package racoonbot;
 use base qw( Bot::BasicBot );
 use WWW::Shorten 'Metamark', ':short';
-
+use URI::Find::Schemeless;
 
 our %memory;
 
@@ -50,10 +50,28 @@ sub log_messages{
 
 sub said {
    my ($self, $message) = @_;
+      
+   my $text = $message->{body};
    
+   my @uris;
+   my $finder = URI::Find::Schemeless->new(sub {
+       my($uri) = shift;
+       push @uris, $uri;
+   });
+   my $tinyurlmsg =  "Shorten urls: ";
+   
+   if ( $finder->find(\$text) ){
+   
+      foreach ( @uris){
+      
+         $tinyurlmsg .= " ".short_link($_);
+      
+      }
+      return $tinyurlmsg;
+   }
    
    my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
-   $msgs .= "in ".scalar localtime;
+   $msgs .= " in ".scalar localtime;
    log_messages("log.txt", $msgs);         
    say $msgs;
    
