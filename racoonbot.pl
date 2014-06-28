@@ -51,24 +51,6 @@ sub log_messages{
 sub said {
    my ($self, $message) = @_;
       
-   my $text = $message->{body};
-   
-   my @uris;
-   my $finder = URI::Find::Schemeless->new(sub {
-       my($uri) = shift;
-       push @uris, $uri;
-   });
-   my $tinyurlmsg =  "Shorten urls: ";
-   
-   if ( $finder->find(\$text) ){
-   
-      foreach ( @uris){
-      
-         $tinyurlmsg .= " ".short_link($_);
-      
-      }
-      return $tinyurlmsg;
-   }
    
    my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
    $msgs .= " in ".scalar localtime;
@@ -90,6 +72,37 @@ sub said {
          if ($message->{body} =~ /$_/i) {
             return $memory{$_};
          }
+      }
+      
+      my $text = $message->{body};
+   
+      my @uris;
+      my $finder = URI::Find::Schemeless->new(sub {
+          my($uri) = shift;
+          push @uris, $uri;
+      });
+      my $tinyurlmsg =  "Shorter urls: ";
+      
+      if ( $finder->find(\$text) ){
+      
+         foreach ( @uris){
+         
+            $tinyurlmsg .= " ".short_link($_);
+         
+         }
+         return $tinyurlmsg;
+      }
+      
+      my $fl = substr $message->{body}, 0, 1;
+      
+      my @mem_list = grep { $_  =~ /^$fl/i} keys %memory;
+      my $words = join ' : ', @mem_list;
+      
+      if(@mem_list){
+         return "Did you mean: $words";
+      }
+      else{
+         return "Key not found! Try again! :(";
       }
    }
 }
