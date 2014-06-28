@@ -2,9 +2,11 @@
 
 use Modern::Perl;
 use autodie;
-
 package racoonbot;
 use base qw( Bot::BasicBot );
+use WWW::Shorten 'Metamark', ':short';
+
+
 our %memory;
 
 sub save_memory{
@@ -36,34 +38,40 @@ sub load_memory{
    return 1;
 }
 
+sub log_messages{
+   my $logfile = shift;
+   my $msg = shift;
+   open my $log, ">>", $logfile;
+   
+   say $log $msg;         
+   
+   close $log;
+}
 
 sub said {
    my ($self, $message) = @_;
-     
-         
+   
+   
+   my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
+   $msgs .= "in ".scalar localtime;
+   log_messages("log.txt", $msgs);         
+   say $msgs;
+   
    if($message->{address} eq 'racoonbot' or 
       $message->{address} eq 'msg')  {
       load_memory("memory.txt");
    
       if ($message->{body} =~ /(.+) =save (.+)/ ) {
-        
-        
         save_memory("memory.txt", $1, $2);
         load_memory("memory.txt");
-        
         return "The key '$1' is stored with value '$2'";
-      
-         
       }
       
       foreach ( keys %memory) {
       
          if ($message->{body} =~ /$_/i) {
-         
             return $memory{$_};
-      
          }
-      
       }
    }
 }
@@ -72,6 +80,6 @@ sub help { "Bot of #minix, always read to help you! Please save only useful thin
 
 racoonbot->new(
    server => 'irc.freenode.net',
-   channels => [ '#minix'],
+   channels => [ '#minix', '#minix-dev'],
    nick => 'racoonbot',
-->run();
+)->run();
