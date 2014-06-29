@@ -8,7 +8,7 @@ use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
 
 our %memory;
-
+our %minix;
 sub save_memory{
 
    my $mem_file = shift;
@@ -25,17 +25,18 @@ sub save_memory{
 
 sub load_memory{
    my $mem_file = shift;
+   my $hashref;
    open my $fh, "<", $mem_file;
-
+   
    while (<$fh>){
       
       my ($key, $value) = split />>/, $_;
-      $memory{$key} = $value;     
+      $hashref->{$key} = $value;     
            
    }
 
    close $fh;
-   return 1;
+   return $hashref;
 }
 
 sub log_messages{
@@ -51,19 +52,38 @@ sub log_messages{
 sub said {
    my ($self, $message) = @_;
       
-   
-   my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
-   $msgs .= " in ".scalar localtime;
-   log_messages("log.txt", $msgs);         
-   say $msgs;
-   
    if($message->{address} eq 'racoonbot' or 
       $message->{address} eq 'msg')  {
-      load_memory("memory.txt");
+      
+      my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
+      $msgs .= " in ".scalar localtime;
+      log_messages("log.txt", $msgs);         
+      say $msgs;
    
+      my $refer = load_memory("memory.txt");
+      %memory = %$refer;
+   
+      if ($message->{body} =~ /^exp (.*)/ ) 
+      {
+      
+         my $refer = load_memory("minix.txt");
+         %minix = %$refer;
+         my $save = $1;
+         foreach (keys %minix){
+         
+            if ($1 =~ /\b$_\b/){
+               chomp($minix{$_});
+               return "$save has $minix{$_} minix exp";
+            }
+         }                  
+      }
+      
       if ($message->{body} =~ /(.+) =save (.+)/ ) {
         save_memory("memory.txt", $1, $2);
-        load_memory("memory.txt");
+        my $refer = load_memory("memory.txt");
+        %memory = %$refer;
+        
+        
         return "The key '$1' is stored with value '$2'";
       }
       
@@ -74,7 +94,20 @@ sub said {
          }
       }
       
-      my $text = $message->{body};
+      my $fl = substr $message->{body}, 0, 1;
+      
+      my @mem_list = grep { $_  =~ /^$fl/i} keys %memory;
+      my $words = join ' : ', @mem_list;
+      
+      if(@mem_list){
+         return "Did you mean: $words";
+      }
+      else{
+         return "Key not found! Try again! :(";
+      }
+   }
+   
+   my $text = $message->{body};
    
       my @uris;
       my $finder = URI::Find::Schemeless->new(sub {
@@ -93,24 +126,30 @@ sub said {
          return $tinyurlmsg;
       }
       
-      my $fl = substr $message->{body}, 0, 1;
-      
-      my @mem_list = grep { $_  =~ /^$fl/i} keys %memory;
-      my $words = join ' : ', @mem_list;
-      
-      if(@mem_list){
-         return "Did you mean: $words";
+      if ($message->{body} =~ /(.*)\+\+/ ) 
+      {
+         say "match!";
+         my $name = $1;
+         my $refer = load_memory("minix.txt");
+         %minix = %$refer;
+         
+         my $check;
+         foreach ( keys %minix){
+            
+            if ($1 =~ /\b$_\b/){
+               save_memory("minix.txt", $name, ++$minix{$_});
+               $check++;
+               last;
+            }
+         }
+         save_memory("minix.txt", $name, ++$minix{$_}) unless $check;
       }
-      else{
-         return "Key not found! Try again! :(";
-      }
-   }
 }
 
 sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
 racoonbot->new(
    server => 'irc.freenode.net',
-   channels => [ '#minix', '#minix-dev'],
+   channels => [ '#minix', "#minix-dev"],
    nick => 'racoonbot',
 )->run();
