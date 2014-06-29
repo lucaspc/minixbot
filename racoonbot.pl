@@ -7,6 +7,8 @@ use base qw( Bot::BasicBot );
 use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
 
+
+#save keys and values using syntax key>>value
 sub save_memory{
 
    my $mem_file = shift;
@@ -21,6 +23,7 @@ sub save_memory{
    return 1;
 }
 
+#load from a memory file to a hash following the syntax key>>value
 sub load_memory{
    my $mem_file = shift;
    my $hashref;
@@ -37,6 +40,7 @@ sub load_memory{
    return $hashref;
 }
 
+#store messages sent to the bot in a log file
 sub log_messages{
    my $logfile = shift;
    my $msg = shift;
@@ -47,10 +51,13 @@ sub log_messages{
    close $log;
 }
 
+
+#the 'ear' of the bot, here he listen every message and parses it and then
+#return the message 
 sub said {
    my ($self, $message) = @_;
       
-   if($message->{address} eq 'racoonbot' or 
+   if($message->{address} eq 'racoonbot' or #messages to bot 
       $message->{address} eq 'msg')  {
       
       my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
@@ -58,7 +65,7 @@ sub said {
       log_messages("log.txt", $msgs);         
       say $msgs;
    
-      if ($message->{body} =~ /(.*)\+\+/ ) 
+      if ($message->{body} =~ /(.*)\+\+/ ) #find things like 'word++' 
       {
          
          my $name = $1;
@@ -78,7 +85,7 @@ sub said {
       
       my $refer = load_memory("memory.txt");
          
-      if ($message->{body} =~ /^exp (.*)/ ) 
+      if ($message->{body} =~ /^exp (.*)/ )#find things like 'exp word' 
       {
       
          my $refer = load_memory("minix.txt");
@@ -98,11 +105,38 @@ sub said {
          }                  
       }
       
-      if ($message->{body} =~ /(.+) =save (.+)/ ) {
-        save_memory("memory.txt", $1, $2);
-        my $refer = load_memory("memory.txt");
+      if ($message->{body} =~ /(.+) =save (.+)/ ) { # key =save value
+        
+        #replacing links
+         my $text =  $message->{body};
+
+         my @uris;
+         my $finder = URI::Find::Schemeless->new(sub {
+             my $uri = shift;
+             push @uris, $uri;
+         });
+
+         print "@uris\n";
+         my $count = 1;
+         if ($finder->find(\$text)){
+
+            foreach (@uris){
                
-        return "The key '$1' is stored with value '$2'";
+               my $short = short_link($_);
+
+               $text =~ s/$count/$short/g;
+               $count++;
+            }
+
+        }
+        
+        if ($text =~ /(.+) =save (.+)/){
+                        
+           save_memory("memory.txt", $1, $2);
+           my $refer = load_memory("memory.txt");
+                  
+           return "The key '$1' is stored with value '$2'"; #message of storage
+      }
       }
       
       foreach ( keys %$refer) {
@@ -144,10 +178,10 @@ sub said {
             $tinyurlmsg .= " ".short_link($_);
          
          }
-         return $tinyurlmsg;
+         return $tinyurlmsg; #shorter urls are returned
       }
       
-      if ($message->{body} =~ /(.*)\+\+/ ) 
+      if ($message->{body} =~ /(.*)\+\+/ ) #search in memory for added names 
       {
          my $name = $1;
          my $refer = load_memory("minix.txt");
@@ -166,10 +200,12 @@ sub said {
    return;
 }
 
+#help of the bot
 sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
+#attributes of the bot
 racoonbot->new(
    server => 'irc.freenode.net',
    channels => [ '#minix', '#minix-dev'],
-   nick => 'racoonbot'
+   nick => 'racoonbot',
 )->run();
