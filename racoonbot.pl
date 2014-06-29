@@ -7,8 +7,6 @@ use base qw( Bot::BasicBot );
 use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
 
-our %memory;
-our %minix;
 sub save_memory{
 
    my $mem_file = shift;
@@ -60,20 +58,42 @@ sub said {
       log_messages("log.txt", $msgs);         
       say $msgs;
    
+      if ($message->{body} =~ /(.*)\+\+/ ) 
+      {
+         
+         my $name = $1;
+         my $refer = load_memory("minix.txt");
+                 
+         my $check;
+         foreach ( keys %$refer){
+            
+            if ($1 =~ /\b$_\b/){
+               save_memory("minix.txt", $name, ++$refer->{$_});
+               $check++;
+               last;
+            }
+         }
+         save_memory("minix.txt", $name, ++$refer->{$_}) unless $check;
+      }
+      
       my $refer = load_memory("memory.txt");
-      %memory = %$refer;
-   
+         
       if ($message->{body} =~ /^exp (.*)/ ) 
       {
       
          my $refer = load_memory("minix.txt");
-         %minix = %$refer;
          my $save = $1;
-         foreach (keys %minix){
+         
+         foreach (keys %$refer){
          
             if ($1 =~ /\b$_\b/){
-               chomp($minix{$_});
-               return "$save has $minix{$_} minix exp";
+               chomp($refer->{$_});
+               return "$save has $refer->{$_} minix exp";
+            }
+            
+            else{
+               return "$save has no minix exp";
+            
             }
          }                  
       }
@@ -81,26 +101,27 @@ sub said {
       if ($message->{body} =~ /(.+) =save (.+)/ ) {
         save_memory("memory.txt", $1, $2);
         my $refer = load_memory("memory.txt");
-        %memory = %$refer;
-        
-        
+               
         return "The key '$1' is stored with value '$2'";
       }
       
-      foreach ( keys %memory) {
+      foreach ( keys %$refer) {
       
-         if ($message->{body} =~ /$_/i) {
-            return $memory{$_};
+         if ($message->{body} =~ /\b$_\b/i) {
+            return $refer->{$_};
          }
       }
       
       my $fl = substr $message->{body}, 0, 1;
       
-      my @mem_list = grep { $_  =~ /^$fl/i} keys %memory;
+      my @mem_list = grep { $_  =~ /^$fl/i} keys %$refer;
       my $words = join ' : ', @mem_list;
       
       if(@mem_list){
          return "Did you mean: $words";
+      }
+      elsif ( $message->{body} =~ /(.*)\+\+/  ){
+         return;
       }
       else{
          return "Key not found! Try again! :(";
@@ -128,28 +149,27 @@ sub said {
       
       if ($message->{body} =~ /(.*)\+\+/ ) 
       {
-         say "match!";
          my $name = $1;
          my $refer = load_memory("minix.txt");
-         %minix = %$refer;
-         
+                  
          my $check;
-         foreach ( keys %minix){
+         foreach ( keys %$refer){
             
             if ($1 =~ /\b$_\b/){
-               save_memory("minix.txt", $name, ++$minix{$_});
+               save_memory("minix.txt", $name, ++$refer->{$_});
                $check++;
-               last;
+               return;
             }
          }
-         save_memory("minix.txt", $name, ++$minix{$_}) unless $check;
+         save_memory("minix.txt", $name, ++$refer->{$_}) unless $check;
       }
+   return;
 }
 
 sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
 racoonbot->new(
    server => 'irc.freenode.net',
-   channels => [ '#minix', "#minix-dev"],
-   nick => 'racoonbot',
+   channels => [ '#minix', '#minix-dev'],
+   nick => 'racoonbot'
 )->run();
