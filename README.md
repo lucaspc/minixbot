@@ -40,6 +40,6 @@ Thanks:
 
 -zacts in #minix at irc.freenode.net
 
--#perl channel at irc.freenode.net specially for mst, DrForr, BenGoldberg, Su-Shee, Zoffix, rindolf, Altreus, Botje, anno
+-#perl channel at irc.freenode.net specially for mst, pink_mist, DrForr, BenGoldberg, Su-Shee, Zoffix, rindolf, Altreus, Botje, anno
 
 -jkg, thrig, LeoNerd, Gabor Szabo and others I forgot to quote, their help are invaluable, thanks very much! :)
