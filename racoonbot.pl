@@ -8,6 +8,8 @@ use base qw( Bot::BasicBot );
 use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
 
+our $nick = 'racbot';
+our $password = 'hidden';
 
 #save keys and values using syntax key>>value
 sub save_memory{
@@ -58,7 +60,7 @@ sub log_messages{
 sub said {
    my ($self, $message) = @_;
       
-   if($message->{address} eq 'racbot' or #messages to bot 
+   if($message->{address} eq $nick or #messages to bot 
       $message->{address} eq 'msg')  {
       
       my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
@@ -124,9 +126,14 @@ sub said {
             foreach (@uris){
                
                my $short = short_link($_);
-
+                
+                if (!short_link($_)){
+               
+                  $short = $_;
+                }                
                $text =~ s/$count/$short/g;
                $count++;
+                
             }
 
         }
@@ -137,7 +144,30 @@ sub said {
            my $refer = load_memory("memory.txt");
                   
            return "The key '$1' is stored with value '$2'"; #message of storage
+        }
       }
+      
+      my $text = $message->{body};
+   
+      my @uris;
+      my $finder = URI::Find::Schemeless->new(sub {
+          my($uri) = shift;
+          push @uris, $uri;
+      });
+      
+      my $tinyurlmsg = "Shorter urls: ";
+      
+      if ( $finder->find(\$text) ){
+      
+         foreach ( @uris){
+         
+            
+            $tinyurlmsg .= " ".short_link($_);
+         
+         }
+         unless ($copy eq $tinyurlmsg){
+            return $tinyurlmsg; #shorter urls are returned
+         }
       }
       
       foreach ( keys %$refer) {
@@ -171,7 +201,7 @@ sub said {
           push @uris, $uri;
       });
       my $tinyurlmsg =  "Shorter urls: ";
-      
+      my $copy = $tinyurlmsg; 
       if ( $finder->find(\$text) ){
       
          foreach ( @uris){
@@ -179,7 +209,10 @@ sub said {
             $tinyurlmsg .= " ".short_link($_);
          
          }
-         return $tinyurlmsg; #shorter urls are returned
+         
+         unless ($copy eq $tinyurlmsg){
+            return $tinyurlmsg; #shorter urls are returned
+         }
       }
       
       if ($message->{body} =~ /(.*)\+\+/ ) #search in memory for added names 
@@ -201,12 +234,31 @@ sub said {
    return;
 }
 
+sub tick{
+  
+  my @time = localtime;
+   
+  
+  if ( !($time[1] % 30) ) {
+    my $msg = "Ack at ".scalar localtime; 
+    say $msg;
+    log_messages('ack.txt', $msg); 
+   
+  }
+  
+  return 1;
+      
+}
+
 #help of the bot
 sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
 #attributes of the bot
+
 racbot->new(
    server => 'irc.freenode.net',
+   #port => '8002',
    channels => [ '#minix', '#minix-dev'],
-   nick => 'racbot',
+   nick => $nick,
+   password => $password,  
 )->run();
