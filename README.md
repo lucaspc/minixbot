@@ -17,5 +17,4 @@ Bugs to correct:
 
 Notes:
 
--Require a permanent place (host) to store the bot. At the moment is in my personal computer. But it doesn't sounds good because when I sleep, I turn it off.
-
+-Stored in one of Cloud 9 Servers.
