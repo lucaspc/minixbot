@@ -251,7 +251,7 @@ sub tick{
 }
 
 #help of the bot
-sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
+sub help { "Bot of #minix, always ready to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
 #attributes of the bot
 
