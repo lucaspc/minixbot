@@ -193,28 +193,6 @@ sub said {
       }
    }
    
-   my $text = $message->{body};
-   
-      my @uris;
-      my $finder = URI::Find::Schemeless->new(sub {
-          my($uri) = shift;
-          push @uris, $uri;
-      });
-      my $tinyurlmsg =  "Shorter urls: ";
-      my $copy = $tinyurlmsg; 
-      if ( $finder->find(\$text) ){
-      
-         foreach ( @uris){
-         
-            $tinyurlmsg .= " ".short_link($_);
-         
-         }
-         
-         unless ($copy eq $tinyurlmsg){
-            return $tinyurlmsg; #shorter urls are returned
-         }
-      }
-      
       if ($message->{body} =~ /(.*)\+\+/ ) #search in memory for added names 
       {
          my $name = $1;
