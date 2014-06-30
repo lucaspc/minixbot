@@ -9,7 +9,7 @@ use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
 
 our $nick = 'racbot';
-our $password = 'hidden';
+our $password = 'hiddenforsecurity';
 
 #save keys and values using syntax key>>value
 sub save_memory{
@@ -156,7 +156,7 @@ sub said {
       });
       
       my $tinyurlmsg = "Shorter urls: ";
-      
+      my $copy = $tinyurlmsg;
       if ( $finder->find(\$text) ){
       
          foreach ( @uris){
@@ -239,7 +239,7 @@ sub tick{
   my @time = localtime;
    
   
-  if ( !($time[1] % 30) ) {
+  if ( !($time[1] % 30) and $time[0] == 0 ) {
     my $msg = "Ack at ".scalar localtime; 
     say $msg;
     log_messages('ack.txt', $msg); 
