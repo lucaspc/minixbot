@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
+use lib "/var/lib/stickshift/53acbc524382ecfba5000016/app-root/data/899281/Lib/lib/perl5/";
 use Modern::Perl;
 use autodie;
-package racoonbot;
+package racbot;
 use base qw( Bot::BasicBot );
 use WWW::Shorten 'Metamark', ':short';
 use URI::Find::Schemeless;
@@ -15,7 +16,7 @@ sub save_memory{
    my $key = shift;
    my $value = shift;
    
-   open my $fh, ">>", $mem_file;
+   open my $fh, ">>", $mem_file or die "$!";
    
    print $fh "$key>>$value\n";
    
@@ -57,7 +58,7 @@ sub log_messages{
 sub said {
    my ($self, $message) = @_;
       
-   if($message->{address} eq 'racoonbot' or #messages to bot 
+   if($message->{address} eq 'racbot' or #messages to bot 
       $message->{address} eq 'msg')  {
       
       my $msgs = "$message->{raw_nick} ($message->{address}) $message->{body}";
@@ -204,8 +205,8 @@ sub said {
 sub help { "Bot of #minix, always read to help you! Please save only useful things using key =save value syntax, thanks very much! :)" }
 
 #attributes of the bot
-racoonbot->new(
+racbot->new(
    server => 'irc.freenode.net',
    channels => [ '#minix', '#minix-dev'],
-   nick => 'racoonbot',
+   nick => 'racbot',
 )->run();
