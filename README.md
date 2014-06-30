@@ -13,8 +13,26 @@ Instructions:
 
 Bugs to correct:
 
--Multiple open of chats for racoonbot
+-Multiple open of chats for racbot
 
 Notes:
 
+-Inspired by perlbot at #perl in irc.freenode.net.
+
 -Stored in one of Cloud 9 Servers.
+
+-Add points to names using the syntax 'name++' and 'exp name' to see the points.
+
+-Save and load keys and values.
+
+-Log sent messages.
+
+-Log acknowlegments.
+
+-More features soon...
+
+Thanks:
+
+-zacts in #minix at irc.freenode.net
+-#perl channel at irc.freenode.net specially for mst, DrForr, BenGoldberg, Su-Shee, Zoffix, rindolf, Altreus, Botje, anno
+  jkg, thrig, LeoNerd, Gabor Szabo and others I forgot to quote, but their help were invaluable, thanks very much! :)
