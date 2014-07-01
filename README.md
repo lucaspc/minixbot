@@ -24,7 +24,7 @@ Notes:
 
 -Inspired by perlbot at #perl in irc.freenode.net.
 
--Stored in one of Cloud 9 Servers.
+-Stored in Zoffix server.
 
 -Add points to names using the syntax 'name++' and 'exp name' to see the points.
 
@@ -40,6 +40,6 @@ Thanks:
 
 -zacts in #minix at irc.freenode.net
 
--#perl channel at irc.freenode.net specially for mst, pink_mist, DrForr, BenGoldberg, Su-Shee, Zoffix, rindolf, Altreus, Botje, anno
+-#perl channel at irc.freenode.net specially for mst, pink_mist, DrForr, BenGoldberg, Su-Shee, Zoffix, rindolf, Altreus, Botje, anno, simcop2387
 
 -jkg, thrig, LeoNerd, Gabor Szabo and others I forgot to quote, their help are invaluable, thanks very much! :)
